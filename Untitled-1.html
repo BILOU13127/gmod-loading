@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Chargement du serveur</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+    }
+
+    #bg {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        filter: brightness(0.6) blur(2px);
+        animation: fade 14s infinite;
+        transform: scale(1.05);
+    }
+
+    @keyframes fade {
+        0% { opacity: 1; }
+        45% { opacity: 1; }
+        50% { opacity: 0; }
+        95% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+
+    #overlay {
+        position: absolute;
+        bottom: 60px;
+        left: 60px;
+        max-width: 560px;
+        animation: slideIn 1.2s ease-out;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    #logo {
+        width: 180px;
+        margin-bottom: 20px;
+        opacity: 0.95;
+    }
+
+    h1 {
+        font-size: 44px;
+        margin: 0 0 10px 0;
+        letter-spacing: 3px;
+    }
+
+    p {
+        font-size: 18px;
+        opacity: 0.9;
+        line-height: 1.5em;
+    }
+
+    #tip {
+        margin-top: 18px;
+        font-size: 16px;
+        opacity: 0.75;
+    }
+
+    #progressBox {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 26px;
+        background: rgba(0,0,0,0.6);
+    }
+
+    #bar {
+        width: 0%;
+        height: 100%;
+        background: white;
+        transition: width 0.3s;
+    }
+
+    #percent {
+        position: absolute;
+        right: 15px;
+        bottom: 4px;
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    #topRight {
+        position: absolute;
+        top: 25px;
+        right: 30px;
+        text-align: right;
+        font-size: 14px;
+        opacity: 0.85;
+    }
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+
+<div id="topRight">
+    Serveur Serious RP<br>
+    Connexion en cours...
+</div>
+
+<div id="overlay">
+    <!-- Mets ton logo ici -->
+    <img id="logo" src="logo.png" alt="logo">
+
+    <h1>MFCITYRP</h1>
+    <p>
+        Chargement du serveur...<br>
+        Respect du règlement obligatoire<br>
+        Discord : discord.gg/TONLIEN
+    </p>
+
+    <div id="tip">Astuce : Le RP propre = plus de fun pour tout le monde.</div>
+</div>
+
+<div id="progressBox">
+    <div id="bar"></div>
+    <div id="percent">0%</div>
+</div>
+
+<audio id="music" loop>
+    <source src="music.mp3" type="audio/mpeg">
+    Votre navigateur ne supporte pas l’audio.
+</audio>
+
+<script>
+const audio = document.getElementById("music");
+
+// Essayer de jouer automatiquement
+audio.play().catch(() => {
+    console.log("Autoplay bloqué, attente d’un clic...");
+    // Si bloqué, joue après un clic sur la page
+    document.body.addEventListener("click", () => {
+        audio.play();
+    }, { once: true });
+});
+</script>
+
+
+<script>
+// ===== BACKGROUNDS =====
+const images = [
+    "gta1.jpg",
+    "gta2.jpg",
+    "gta3.jpg",
+    "gta4.jpg"
+];
+
+let i = 0;
+const bg = document.getElementById("bg");
+
+function changeBg() {
+    bg.style.backgroundImage = `url(${images[i]})`;
+    i = (i + 1) % images.length;
+}
+
+setInterval(changeBg, 7000);
+changeBg();
+
+// ===== TIPS ROTATION =====
+const tips = [
+    "Astuce : Utilise /report en cas de problème.",
+    "Astuce : Pas de NoFear, joue ton personnage.",
+    "Astuce : Les scènes doivent être RP du début à la fin.",
+    "Astuce : Lis le règlement Discord."
+];
+
+let tipIndex = 0;
+const tipEl = document.getElementById("tip");
+
+setInterval(() => {
+    tipIndex = (tipIndex + 1) % tips.length;
+    tipEl.style.opacity = 0;
+    setTimeout(() => {
+        tipEl.innerText = tips[tipIndex];
+        tipEl.style.opacity = 0.75;
+    }, 400);
+}, 5000);
+
+// ===== GMOD HOOKS =====
+function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+    document.querySelector("h1").innerText = servername;
+}
+
+function DownloadingFile(file) {}
+function SetStatusChanged(status) {}
+
+function SetFilesTotal(total) { window.total = total; }
+function SetFilesNeeded(needed) {
+    if (!window.total) return;
+    const percent = Math.floor(((window.total - needed) / window.total) * 100);
+    document.getElementById("bar").style.width = percent + "%";
+    document.getElementById("percent").innerText = percent + "%";
+}
+</script>
+
+</body>
+</html>
